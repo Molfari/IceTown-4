@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ice Town</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" rel="stylesheet">
+</head>
+<body>
+    <div class="top-bar">
+        <div class="header">
+            <button id="close-btn">✖ Закрити</button>
+            <h2>Ice Town</h2>
+            <button id="menu-btn"></button>
+        </div>
+        <div class="info-bar">
+            <div class="level-container">
+                <span>Level: <span id="level">0</span></span>
+                <div class="level-bar">
+                    <div id="xp-bar" class="level-fill"></div>
+                </div>
+            </div>
+            <span class="user-info">@test</span>
+            <div class="coin-container">
+                <img src="assets/icons/coin.png" alt="coin">
+                <span id="coins">0</span>
+            </div>
+        </div>
+    </div>
+    <div id="map" class="mapboxgl-map"></div>
+    <div class="energy-bar-container">
+        <div class="energy-icon">⚡</div>
+        <div class="energy-bar">
+            <div id="energy-fill" class="energy-fill"></div>
+        </div>
+        <span id="energy-text" class="energy-text"><span id="current-energy">2000</span>/2000</span>
+    </div>
+    <div class="bottom-bar">
+        <div class="menu-icon active" id="play">
+            <img src="assets/icons/play.png" alt="play">
+            Play to Earn
+        </div>
+        <div class="menu-icon" id="store">
+            <img src="assets/icons/store.png" alt="store">
+            Store
+        </div>
+        <div class="menu-icon" id="leaderboards">
+            <img src="assets/icons/leaderboards.png" alt="leaderboard">
+            Leaderboards
+        </div>
+        <div class="menu-icon" id="profile">
+            <img src="assets/icons/profile.png" alt="profile">
+            Profile
+        </div>
+    </div>
+    <script src="js/ui.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
