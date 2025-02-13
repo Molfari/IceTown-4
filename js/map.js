@@ -4,6 +4,7 @@ console.log('Map.js loaded');
 mapboxgl.accessToken = 'pk.eyJ1IjoiaWNldG93biIsImEiOiJjbTY3dGN0NTYwNm1yMmtzOHRuczlqbnI3In0.QSvL3pbw9YdvjHar6uyJ7g';
 
 // Global state
+const activeBuildings = new Set();
 const buildingProgress = new Map();
 const buildingTimers = new Map();
 const freezeTimers = new Map();
@@ -66,6 +67,20 @@ function isBuildingInRadius(buildingFeature, userPosition, radius) {
 }
 
 // Building progress management
+function updateBuildingColors(map) {
+    const matchExpression = ['match', ['id']];
+    
+    // Додаємо всі активні будівлі до виразу match
+    activeBuildings.forEach(buildingId => {
+        matchExpression.push(buildingId, '#FFD700');
+    });
+    
+    // Додаємо дефолтний колір
+    matchExpression.push('#0066CC');
+    
+    map.setPaintProperty('building', 'fill-color', matchExpression);
+}
+
 function createOrUpdateProgressElement(buildingId, coordinates, map) {
     console.log('Creating/Updating progress element:', { buildingId, coordinates });
     
@@ -112,7 +127,6 @@ function createOrUpdateProgressElement(buildingId, coordinates, map) {
         progress.element.firstChild.classList.remove('generating-coins');
     }
 }
-
 function startCoinGeneration(buildingId, map, buildingFeature) {
     console.log('Starting coin generation for building:', buildingId);
     
@@ -120,17 +134,9 @@ function startCoinGeneration(buildingId, map, buildingFeature) {
     progress.isGeneratingCoins = true;
     progress.coins = 0;
     
-    map.setPaintProperty(
-        'building',
-        'fill-color',
-        [
-            'match',
-            ['id'],
-            buildingId,
-            '#FFD700',
-            '#0066CC'
-        ]
-    );
+    // Додаємо будівлю до активних
+    activeBuildings.add(buildingId);
+    updateBuildingColors(map);
 
     const timer = setInterval(() => {
         if (progress.coins < MAX_COINS_PER_BUILDING) {
@@ -156,7 +162,7 @@ function stopCoinGeneration(buildingId, map, buildingFeature) {
         buildingTimers.delete(buildingId);
     }
 
-    // Очистка існуючих таймерів заморозки
+    // Очищаємо існуючі таймери заморозки
     const existingTimer = freezeTimers.get(buildingId);
     if (existingTimer) {
         clearTimeout(existingTimer.initialTimer);
@@ -177,17 +183,9 @@ function stopCoinGeneration(buildingId, map, buildingFeature) {
         buildingProgress.delete(buildingId);
     }
 
-    map.setPaintProperty(
-        'building',
-        'fill-color',
-        [
-            'match',
-            ['id'],
-            buildingId,
-            '#0066CC',
-            '#0066CC'
-        ]
-    );
+    // Видаляємо будівлю з активних
+    activeBuildings.delete(buildingId);
+    updateBuildingColors(map);
 }
 
 function updateCircleRadius(map, center) {
@@ -257,6 +255,7 @@ function updateUserLocation(map) {
         }
     );
 }
+// Map initialization
 navigator.geolocation.getCurrentPosition(position => {
     console.log('Initial position received:', position.coords);
     
@@ -282,6 +281,7 @@ navigator.geolocation.getCurrentPosition(position => {
 
         updateUserLocation(map);
         setInterval(() => updateUserLocation(map), 30000);
+
         map.on('move', () => {
             if (userMarker && radiusCircle) {
                 const newPosition = map.project(userMarker.getLngLat());
@@ -399,5 +399,5 @@ navigator.geolocation.getCurrentPosition(position => {
     });
 }, error => {
     console.error('Failed to get initial position:', error);
-    alert('НFailed to get initial position');
+    alert('Не вдалося отримати геолокацію');
 });
